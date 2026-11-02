@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Дневник Артро-Питания</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Manrope:wght@700;800&display=swap">
+<style>
+:root {
+  --bg:#f7f5f1;--bg2:#fff;--fg:#1c1a17;--fg2:#6b6560;--fg3:#9c9590;
+  --border:#e8e3db;--accent:#2d8f5e;--accent-l:#e8f5ef;--accent-d:#1e6e46;
+  --gold:#c47a1a;--gold-l:#fef7ed;--red:#dc2626;--red-l:#fef2f2;
+  --blue:#2563eb;--blue-l:#eff6ff;--purple:#7c3aed;--purple-l:#f5f3ff;
+  --card:#fff;--shadow:0 2px 16px rgba(0,0,0,.06);
+}
+@media(prefers-color-scheme:dark){:root{
+  --bg:#111;--bg2:#1a1a1a;--fg:#f0ede8;--fg2:#a09880;--fg3:#6b6050;
+  --border:#2a2720;--accent:#3aae74;--accent-l:#0d2b1a;--accent-d:#5dcc8f;
+  --gold:#e09432;--gold-l:#231e10;--red:#f87171;--red-l:#1f1010;
+  --blue:#60a5fa;--blue-l:#0f1929;--purple:#a78bfa;--purple-l:#1e1a2e;
+  --card:#1e1d1a;--shadow:0 2px 16px rgba(0,0,0,.3);color-scheme:dark;
+}}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--fg);font-family:'Inter',sans-serif;font-size:15px;line-height:1.6;}
+
+.tabs{display:flex;background:var(--bg2);border-bottom:2px solid var(--border);position:sticky;top:0;z-index:50;}
+.tab{flex:1;padding:10px 4px 8px;text-align:center;font-size:11px;font-weight:600;color:var(--fg3);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .15s;white-space:nowrap;}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+.tab .ti{display:block;font-size:18px;margin-bottom:2px;}
+.tab{position:relative;}
+.tab-badge{position:absolute;top:6px;right:calc(50% - 14px);width:16px;height:16px;border-radius:50%;background:var(--red);color:#fff;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;pointer-events:none;}
+
+.screen{display:none;padding:16px 14px 80px;max-width:520px;margin:0 auto;}
+.screen.active{display:block;animation:fadeIn .15s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+/* PUSH PREVIEW */
+.push-preview{background:linear-gradient(135deg,#1c1a17,#2a2720);border-radius:18px;padding:20px;margin-bottom:12px;color:#fff;position:relative;overflow:hidden;}
+.push-preview::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent),var(--blue));}
+.push-phone{border:2.5px solid rgba(255,255,255,.2);border-radius:22px;padding:14px;background:rgba(255,255,255,.05);backdrop-filter:blur(4px);}
+.push-notif{background:rgba(255,255,255,.95);border-radius:14px;padding:12px 14px;display:flex;gap:10px;align-items:flex-start;color:#111;}
+.push-app-icon{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--accent),var(--accent-d));display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.push-notif-text{flex:1;}
+.push-notif-title{font-size:12px;font-weight:700;margin-bottom:2px;}
+.push-notif-body{font-size:12px;color:#444;line-height:1.4;}
+.push-notif-time{font-size:10px;color:#999;margin-top:3px;}
+
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px;margin-bottom:12px;box-shadow:var(--shadow);}
+.card-title{font-family:'Manrope',sans-serif;font-weight:800;font-size:16px;margin-bottom:6px;}
+.card-sub{font-size:13px;color:var(--fg3);}
+
+.streak-banner{background:linear-gradient(135deg,var(--accent),var(--accent-d));border-radius:18px;padding:20px;margin-bottom:12px;color:#fff;position:relative;overflow:hidden;cursor:pointer;}
+.streak-banner::after{content:'🔥';position:absolute;right:16px;top:50%;transform:translateY(-50%);font-size:64px;opacity:.18;}
+.streak-banner .slabel{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;opacity:.85;}
+.streak-banner .snum{font-family:'Manrope',sans-serif;font-size:56px;font-weight:800;line-height:1;margin:2px 0;}
+.streak-banner .ssub{font-size:13px;opacity:.85;}
+
+.today-block{display:flex;gap:8px;margin-bottom:12px;}
+.intake-btn{flex:1;padding:14px 8px;border-radius:14px;border:2px dashed var(--border);background:var(--bg);text-align:center;cursor:pointer;transition:all .2s;font-size:12px;font-weight:600;color:var(--fg3);}
+.intake-btn.done{background:var(--accent-l);border-color:var(--accent);color:var(--accent);}
+.intake-btn .big{font-size:26px;display:block;margin-bottom:3px;}
+
+.tip-card{background:var(--gold-l);border:1px solid #f5d87e;border-radius:14px;padding:14px;margin-bottom:12px;}
+.tip-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--gold);margin-bottom:5px;}
+.tip-text{font-size:14px;color:var(--fg);line-height:1.5;}
+
+.week-row{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-bottom:4px;}
+.week-day{aspect-ratio:1;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;background:var(--bg);border:1.5px solid var(--border);color:var(--fg3);transition:all .3s;}
+.week-day.done{background:var(--accent-l);border-color:var(--accent);}
+.week-day.today{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-l);}
+.week-labels{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;text-align:center;font-size:10px;color:var(--fg3);font-weight:600;margin-top:4px;}
+
+.prog-wrap{background:var(--border);border-radius:99px;height:10px;margin:10px 0 6px;overflow:hidden;}
+.prog-bar{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-d));border-radius:99px;transition:width .6s cubic-bezier(.4,0,.2,1);}
+
+/* WATER */
+.water-track{display:flex;gap:5px;align-items:center;flex-wrap:wrap;margin:10px 0;}
+.water-cup{width:30px;height:30px;border-radius:8px;border:1.5px solid var(--blue);background:var(--bg);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;transition:all .2s;}
+.water-cup.filled{background:var(--blue-l);border-color:var(--blue);}
+
+.bottle-wrap{display:flex;gap:8px;align-items:center;margin:12px 0;}
+.bottle-visual{display:flex;gap:3px;flex-wrap:wrap;flex:1;}
+.bottle-dot{width:13px;height:13px;border-radius:50%;background:var(--accent);transition:all .2s;}
+.bottle-dot.empty{background:var(--border);}
+
+.feel-row{display:flex;gap:6px;justify-content:center;margin:10px 0;}
+.feel-btn{flex:1;padding:10px 4px;border-radius:12px;border:1.5px solid var(--border);background:var(--bg);text-align:center;cursor:pointer;font-size:11px;font-weight:600;color:var(--fg3);transition:all .2s;}
+.feel-btn.selected{border-color:var(--accent);background:var(--accent-l);color:var(--accent);}
+.feel-btn .fe{font-size:22px;display:block;margin-bottom:3px;}
+
+.joint-map{position:relative;width:140px;height:260px;flex-shrink:0;}
+.jdot{position:absolute;width:22px;height:22px;border-radius:50%;border:2.5px solid #fff;cursor:pointer;transition:all .2s;box-shadow:0 2px 8px rgba(0,0,0,.2);}
+.jdot.ok{background:#22c55e;}
+.jdot.mild{background:#f59e0b;}
+.jdot.pain{background:#ef4444;}
+.jdot.none{background:var(--border);}
+
+.pill{display:inline-block;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;margin-bottom:8px;}
+.pill-g{background:var(--accent-l);color:var(--accent);}
+.pill-o{background:var(--gold-l);color:var(--gold);}
+.pill-b{background:var(--blue-l);color:var(--blue);}
+.pill-p{background:var(--purple-l);color:var(--purple);}
+
+.art-img{width:100%;height:110px;border-radius:12px;margin-bottom:10px;display:flex;align-items:center;justify-content:center;font-size:44px;}
+.art-title{font-family:'Manrope',sans-serif;font-weight:700;font-size:15px;line-height:1.3;margin-bottom:4px;}
+.art-meta{font-size:12px;color:var(--fg3);margin-bottom:8px;}
+.art-text{font-size:14px;color:var(--fg2);line-height:1.6;}
+.read-more{display:inline-block;margin-top:10px;font-size:13px;font-weight:700;color:var(--accent);cursor:pointer;background:var(--accent-l);padding:7px 16px;border-radius:10px;transition:all .15s;}
+.read-more:hover{background:var(--accent);color:#fff;}
+
+.quiz-opt{padding:12px 14px;border-radius:12px;border:1.5px solid var(--border);margin-bottom:7px;cursor:pointer;font-size:14px;transition:all .15s;}
+.quiz-opt:hover:not(.correct):not(.wrong){border-color:var(--accent);background:var(--accent-l);}
+.quiz-opt.correct{background:#dcfce7;border-color:#22c55e;color:#166534;}
+.quiz-opt.wrong{background:var(--red-l);border-color:var(--red);color:var(--red);}
+
+.share-card{background:linear-gradient(135deg,var(--accent-l),var(--blue-l));border:1px solid var(--border);border-radius:16px;padding:18px;margin-bottom:12px;text-align:center;}
+
+/* ONBOARDING */
+.ob-step{display:none;}
+.ob-step.active{display:block;}
+.ob-icon{font-size:56px;text-align:center;margin-bottom:14px;}
+.ob-title{font-family:'Manrope',sans-serif;font-weight:800;font-size:22px;text-align:center;margin-bottom:8px;}
+.ob-text{font-size:15px;color:var(--fg2);text-align:center;line-height:1.65;margin-bottom:20px;}
+.ob-input{width:100%;padding:14px 16px;border-radius:12px;border:1.5px solid var(--border);background:var(--bg);color:var(--fg);font-size:15px;font-family:inherit;outline:none;margin-bottom:10px;}
+.ob-input:focus{border-color:var(--accent);}
+.ob-dots{display:flex;gap:7px;justify-content:center;margin-bottom:20px;}
+.ob-dot{width:8px;height:8px;border-radius:50%;background:var(--border);transition:all .2s;}
+.ob-dot.active{background:var(--accent);width:20px;border-radius:4px;}
+.btn{width:100%;padding:15px;border-radius:14px;border:none;font-size:15px;font-weight:700;font-family:inherit;cursor:pointer;transition:all .15s;}
+.btn-primary{background:var(--accent);color:#fff;}
+.btn-primary:hover{background:var(--accent-d);}
+.btn-ghost{background:var(--bg);color:var(--fg2);border:1.5px solid var(--border);margin-top:8px;}
+
+.stat-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px;}
+.stat-box{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:12px 8px;text-align:center;}
+.stat-num{font-family:'Manrope',sans-serif;font-weight:800;font-size:24px;color:var(--accent);}
+.stat-label{font-size:10px;color:var(--fg3);font-weight:600;margin-top:2px;}
+.notif-row{display:flex;align-items:center;justify-content:space-between;padding:13px 0;border-bottom:1px solid var(--border);}
+.notif-label{font-size:14px;font-weight:500;}
+.notif-sub{font-size:12px;color:var(--fg3);margin-top:2px;}
+.toggle{width:44px;height:26px;border-radius:13px;background:var(--border);position:relative;cursor:pointer;transition:background .2s;flex-shrink:0;}
+.toggle.on{background:var(--accent);}
+.toggle::after{content:'';position:absolute;width:20px;height:20px;border-radius:50%;background:#fff;top:3px;left:3px;transition:left .2s;box-shadow:0 1px 4px rgba(0,0,0,.2);}
+.toggle.on::after{left:21px;}
+.badge{display:inline-block;font-size:12px;font-weight:700;padding:4px 11px;border-radius:20px;}
+.badge-g{background:var(--accent-l);color:var(--accent);border:1px solid var(--accent);}
+.badge-o{background:var(--gold-l);color:var(--gold);border:1px solid #f5d87e;}
+
+.cx-block{border-radius:14px;padding:14px 16px;margin-bottom:12px;border:1px solid;}
+.cx-block h3{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px;}
+.cx-block ul{list-style:none;padding:0;}
+.cx-block li{font-size:13px;padding:3px 0 3px 18px;position:relative;}
+.cx-block li::before{content:'→';position:absolute;left:0;font-weight:700;}
+.funnel-step{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--border);}
+.funnel-num{width:30px;height:30px;border-radius:50%;background:var(--accent);color:#fff;font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.funnel-title{font-weight:700;font-size:14px;margin-bottom:2px;}
+.funnel-desc{font-size:12px;color:var(--fg2);}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;align-items:flex-end;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal-sheet{background:var(--card);border-radius:20px 20px 0 0;max-height:88vh;overflow-y:auto;padding:20px 18px 48px;width:100%;max-width:520px;animation:slideUp .25s ease;}
+.modal-handle{width:40px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 18px;cursor:pointer;}
+.modal-art-img{width:100%;height:140px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:56px;margin-bottom:16px;}
+.modal-body{font-size:15px;line-height:1.75;color:var(--fg2);}
+.modal-body h3{font-family:'Manrope',sans-serif;font-weight:800;font-size:17px;color:var(--fg);margin:18px 0 8px;}
+.modal-body p{margin-bottom:12px;}
+.modal-body .highlight{background:var(--accent-l);border-left:3px solid var(--accent);padding:11px 14px;border-radius:0 10px 10px 0;font-size:14px;color:var(--fg);margin:14px 0;line-height:1.6;}
+
+/* TOAST */
+.toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;padding:12px 24px;border-radius:12px;font-weight:700;font-size:14px;z-index:999;box-shadow:0 4px 16px rgba(0,0,0,.2);pointer-events:none;opacity:0;transition:opacity .25s;white-space:nowrap;}
+.toast.show{opacity:1;}
+
+/* QUIZ next btn */
+.quiz-next{display:none;margin-top:10px;padding:10px 18px;border-radius:10px;border:none;background:var(--accent);color:#fff;font-weight:700;font-size:14px;font-family:inherit;cursor:pointer;width:100%;}
+
+@keyframes pop{0%{transform:scale(1)}50%{transform:scale(1.15)}100%{transform:scale(1)}}
+.pop{animation:pop .3s ease;}
+@keyframes slideUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:none}}
+@keyframes streakPop{0%{transform:scale(1)}40%{transform:scale(1.2)}60%{transform:scale(0.95)}100%{transform:scale(1)}}
+.streak-pop{animation:streakPop .45s ease;}
+</style>
+</head>
+<body>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="handleModalClick(event)">
+  <div class="modal-sheet" id="modalSheet">
+    <div class="modal-handle" onclick="closeModal()"></div>
+    <div class="modal-art-img" id="modalImg"></div>
+    <div class="pill pill-o" id="modalPill"></div>
+    <div class="art-title" id="modalTitle" style="font-size:19px;margin-bottom:14px;font-family:'Manrope',sans-serif;font-weight:800;"></div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- ══ ONBOARDING ══ -->
+<div id="onboarding" style="max-width:520px;margin:0 auto;padding:28px 18px 40px;">
+  <div class="ob-dots">
+    <div class="ob-dot active" id="dot0"></div>
+    <div class="ob-dot" id="dot1"></div>
+    <div class="ob-dot" id="dot2"></div>
+    <div class="ob-dot" id="dot3"></div>
+    <div class="ob-dot" id="dot4"></div>
+  </div>
+  <div class="ob-step active" id="ob0">
+    <div class="ob-icon">💊</div>
+    <div class="ob-title">Дневник Артро-Питания</div>
+    <div class="ob-text">Отмечайте приём каждый день, следите за состоянием суставов и получайте персональные советы</div>
+    <button class="btn btn-primary" onclick="nextOb()">Начать →</button>
+  </div>
+  <div class="ob-step" id="ob1">
+    <div class="ob-icon">👤</div>
+    <div class="ob-title">Как вас зовут?</div>
+    <div class="ob-text">Будем обращаться лично и присылать советы под ваш запрос</div>
+    <input class="ob-input" id="nameInput" placeholder="Ваше имя" type="text">
+    <button class="btn btn-primary" onclick="nextOb()">Продолжить</button>
+  </div>
+  <div class="ob-step" id="ob2">
+    <div class="ob-icon">🦵</div>
+    <div class="ob-title">Где беспокоят суставы?</div>
+    <div class="ob-text">Подберём упражнения и советы для вашей области</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:18px;">
+      <div class="intake-btn" onclick="this.classList.toggle('done')"><span class="big">🦵</span>Колени</div>
+      <div class="intake-btn" onclick="this.classList.toggle('done')"><span class="big">✋</span>Руки / пальцы</div>
+      <div class="intake-btn" onclick="this.classList.toggle('done')"><span class="big">🔙</span>Позвоночник</div>
+      <div class="intake-btn" onclick="this.classList.toggle('done')"><span class="big">🦴</span>Тазобедренные</div>
+    </div>
+    <button class="btn btn-primary" onclick="nextOb()">Продолжить</button>
+  </div>
+  <div class="ob-step" id="ob3">
+    <div class="ob-icon">🔔</div>
+    <div class="ob-title">Время напоминания</div>
+    <div class="ob-text">Когда напомнить принять Артро-Питание?</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:18px;" id="timePicker">
+      <div class="intake-btn" onclick="selectOne('#timePicker',this)"><span class="big">🌅</span>Утро 8:00</div>
+      <div class="intake-btn" onclick="selectOne('#timePicker',this)"><span class="big">☀️</span>День 12:00</div>
+      <div class="intake-btn" onclick="selectOne('#timePicker',this)"><span class="big">🌆</span>Вечер 18:00</div>
+      <div class="intake-btn" onclick="selectOne('#timePicker',this)"><span class="big">🌙</span>Ночь 21:00</div>
+    </div>
+    <button class="btn btn-primary" onclick="nextOb()">Продолжить</button>
+  </div>
+  <div class="ob-step" id="ob4">
+    <div class="ob-icon">📦</div>
+    <div class="ob-title">Когда открыли флакон?</div>
+    <div class="ob-text">Отследим, когда пора пополнить запас</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:18px;" id="bottlePicker">
+      <div class="intake-btn" onclick="selectOne('#bottlePicker',this)"><span class="big">🆕</span>Сегодня</div>
+      <div class="intake-btn" onclick="selectOne('#bottlePicker',this)"><span class="big">📅</span>~неделю</div>
+      <div class="intake-btn" onclick="selectOne('#bottlePicker',this)"><span class="big">🗓️</span>~2 недели</div>
+    </div>
+    <button class="btn btn-primary" onclick="enterApp()">Начать дневник ✓</button>
+    <button class="btn btn-ghost" onclick="enterApp()">Пропустить</button>
+  </div>
+</div>
+
+<!-- ══ MAIN APP ══ -->
+<div id="app" style="display:none;">
+  <div class="tabs">
+    <div class="tab active" onclick="showTab('home',this)"><span class="ti">🏠</span>Дневник</div>
+    <div class="tab" id="tab-feel" onclick="showTab('feel',this)"><span class="ti">📊</span>Чекап<div class="tab-badge" id="feelBadge">1</div></div>
+    <div class="tab" onclick="showTab('facts',this)"><span class="ti">📖</span>Статьи</div>
+    <div class="tab" onclick="showTab('profile',this)"><span class="ti">👤</span>Профиль</div>
+    <div class="tab" onclick="showTab('concept',this)"><span class="ti">💡</span>Концепт</div>
+  </div>
+
+  <!-- ══ HOME ══ -->
+  <div class="screen active" id="screen-home">
+    <div class="streak-banner" id="streakBanner" onclick="animateStreak()">
+      <div class="slabel">🔥 Серия дней</div>
+      <div class="snum" id="streakNum">12</div>
+      <div class="ssub" id="streakSub">дней подряд — отличный результат!</div>
+    </div>
+
+    <div class="tip-card">
+      <div class="tip-label">💡 Совет на сегодня</div>
+      <div class="tip-text" id="dailyTip"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Приём сегодня</div>
+      <div class="card-sub" style="margin-bottom:12px;">Отметьте одним тапом</div>
+      <div class="today-block">
+        <div class="intake-btn done" id="btn-morning" onclick="toggleIntake('morning',this)"><span class="big">✅</span>Утром</div>
+        <div class="intake-btn" id="btn-evening" onclick="toggleIntake('evening',this)"><span class="big">⏳</span>Вечером</div>
+      </div>
+      <div id="intakeMsg" style="font-size:13px;color:var(--accent);text-align:center;min-height:18px;"></div>
+    </div>
+
+    <!-- WATER -->
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+        <div class="card-title" style="margin:0;">💧 Вода сегодня</div>
+        <div id="waterCount" style="font-family:'Manrope',sans-serif;font-weight:800;font-size:20px;color:var(--blue);">3 / 8</div>
+      </div>
+      <div class="card-sub" style="margin-bottom:10px;">Нажмите на стакан — отметить выпитый</div>
+      <div class="water-track" id="waterTrack"></div>
+      <div style="font-size:12px;color:var(--fg3);margin-top:8px;" id="waterTip"></div>
+    </div>
+
+    <!-- WEEK -->
+    <div class="card">
+      <div class="card-title">Эта неделя</div>
+      <div class="card-sub" style="margin-bottom:10px;" id="weekSub"></div>
+      <div class="week-row" id="weekGrid"></div>
+      <div class="week-labels"><div>Пн</div><div>Вт</div><div>Ср</div><div>Чт</div><div>Пт</div><div>Сб</div><div>Вс</div></div>
+    </div>
+
+    <!-- COURSE -->
+    <div class="card">
+      <div class="card-title">Прогресс курса</div>
+      <div class="card-sub" style="margin-bottom:8px;">Неделя 4 из 12</div>
+      <div class="prog-wrap"><div class="prog-bar" style="width:33%"></div></div>
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--fg3);">
+        <span>Старт</span><span>Первый эффект ~6 нед.</span><span>Финиш</span>
+      </div>
+    </div>
+
+    <!-- BOTTLE -->
+    <div class="card">
+      <div class="card-title">📦 Флакон</div>
+      <div class="card-sub" style="margin-bottom:10px;">Осталось ~21 доза · ~18 дней</div>
+      <div class="bottle-wrap">
+        <div class="bottle-visual" id="bottleDots"></div>
+        <div style="font-size:28px;">💊</div>
+      </div>
+      <div style="font-size:13px;color:var(--fg3);">Израсходовано: <strong style="color:var(--accent)">9 из 30 доз</strong></div>
+    </div>
+
+    <!-- EXERCISE -->
+    <div class="card">
+      <div class="card-title">💪 Упражнение дня</div>
+      <div class="card-sub" id="exName" style="margin-bottom:8px;font-weight:600;"></div>
+      <div style="font-size:14px;color:var(--fg2);" id="exText"></div>
+      <button class="btn btn-primary" id="exBtn" style="margin-top:12px;padding:11px;" onclick="nextExercise()">Следующее упражнение →</button>
+    </div>
+
+    <!-- SHARE -->
+    <div class="share-card">
+      <div style="font-size:32px;margin-bottom:8px;">🎁</div>
+      <div style="font-size:14px;font-weight:700;color:var(--fg);margin-bottom:6px;">Поделитесь с другом</div>
+      <div style="font-size:13px;color:var(--fg2);margin-bottom:14px;">За каждого друга +3 дня к вашей серии</div>
+      <button class="btn btn-primary" onclick="shareApp()" style="padding:11px;">Пригласить друга</button>
+    </div>
+  </div>
+
+  <!-- ══ FEEL ══ -->
+  <div class="screen" id="screen-feel">
+    <div class="card-title" style="margin-bottom:4px;">📊 Чекап самочувствия</div>
+    <div class="card-sub" style="margin-bottom:16px;">Фиксируйте ежедневно — увидите динамику</div>
+
+    <div class="card">
+      <div class="card-title">Как суставы сегодня?</div>
+      <div class="feel-row">
+        <div class="feel-btn" onclick="setFeel(0,this)"><span class="fe">😣</span>Больно</div>
+        <div class="feel-btn" onclick="setFeel(1,this)"><span class="fe">😕</span>Дискомфорт</div>
+        <div class="feel-btn" onclick="setFeel(2,this)"><span class="fe">😐</span>Нормально</div>
+        <div class="feel-btn" onclick="setFeel(3,this)"><span class="fe">😊</span>Хорошо</div>
+      </div>
+      <div id="feelThanks" style="font-size:13px;color:var(--accent);text-align:center;min-height:20px;margin-top:6px;"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Динамика за 7 дней</div>
+      <div class="card-sub" style="margin-bottom:10px;">Тенденция к улучшению 📈</div>
+      <div id="feelChart" style="display:flex;align-items:flex-end;gap:4px;height:80px;margin:10px 0;"></div>
+      <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center;font-size:9px;color:var(--fg3);font-weight:600;">
+        <div>Пн</div><div>Вт</div><div>Ср</div><div>Чт</div><div>Пт</div><div>Сб</div><div>Вс</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Карта суставов</div>
+      <div class="card-sub" style="margin-bottom:12px;">Нажмите — отметьте состояние</div>
+      <div style="display:flex;gap:12px;align-items:flex-start;">
+        <div class="joint-map" id="jointMap">
+          <svg viewBox="0 0 80 200" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;opacity:.15;position:absolute;top:0;left:0;">
+            <ellipse cx="40" cy="18" rx="14" ry="16" fill="currentColor"/>
+            <rect x="26" y="34" width="28" height="60" rx="8" fill="currentColor"/>
+            <rect x="10" y="36" width="14" height="50" rx="7" fill="currentColor"/>
+            <rect x="56" y="36" width="14" height="50" rx="7" fill="currentColor"/>
+            <rect x="26" y="92" width="12" height="70" rx="6" fill="currentColor"/>
+            <rect x="42" y="92" width="12" height="70" rx="6" fill="currentColor"/>
+          </svg>
+          <div class="jdot ok" style="left:30%;top:22%;transform:translate(-50%,-50%);" data-name="Плечо Л" onclick="cycleJoint(this)"></div>
+          <div class="jdot ok" style="left:70%;top:22%;transform:translate(-50%,-50%);" data-name="Плечо П" onclick="cycleJoint(this)"></div>
+          <div class="jdot mild" style="left:18%;top:42%;transform:translate(-50%,-50%);" data-name="Локоть Л" onclick="cycleJoint(this)"></div>
+          <div class="jdot ok" style="left:82%;top:42%;transform:translate(-50%,-50%);" data-name="Локоть П" onclick="cycleJoint(this)"></div>
+          <div class="jdot ok" style="left:15%;top:60%;transform:translate(-50%,-50%);" data-name="Запястье Л" onclick="cycleJoint(this)"></div>
+          <div class="jdot ok" style="left:85%;top:60%;transform:translate(-50%,-50%);" data-name="Запястье П" onclick="cycleJoint(this)"></div>
+          <div class="jdot pain" style="left:35%;top:72%;transform:translate(-50%,-50%);" data-name="Колено Л" onclick="cycleJoint(this)"></div>
+          <div class="jdot pain" style="left:65%;top:72%;transform:translate(-50%,-50%);" data-name="Колено П" onclick="cycleJoint(this)"></div>
+          <div class="jdot mild" style="left:32%;top:88%;transform:translate(-50%,-50%);" data-name="Голеностоп Л" onclick="cycleJoint(this)"></div>
+          <div class="jdot ok" style="left:68%;top:88%;transform:translate(-50%,-50%);" data-name="Голеностоп П" onclick="cycleJoint(this)"></div>
+        </div>
+        <div style="flex:1;">
+          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;">
+            <div style="font-size:11px;display:flex;align-items:center;gap:4px;font-weight:600;"><span style="width:10px;height:10px;border-radius:50%;background:#22c55e;display:block;"></span>Норма</div>
+            <div style="font-size:11px;display:flex;align-items:center;gap:4px;font-weight:600;"><span style="width:10px;height:10px;border-radius:50%;background:#f59e0b;display:block;"></span>Дискомфорт</div>
+            <div style="font-size:11px;display:flex;align-items:center;gap:4px;font-weight:600;"><span style="width:10px;height:10px;border-radius:50%;background:#ef4444;display:block;"></span>Боль</div>
+          </div>
+          <div id="jointInfo" style="background:var(--bg);border-radius:10px;padding:10px;min-height:70px;font-size:13px;color:var(--fg2);line-height:1.5;">
+            Нажмите на сустав — отметьте состояние и получите совет.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- QUIZ -->
+    <div class="card" id="quizCard">
+      <div class="pill pill-p">🎯 Вопрос дня</div>
+      <div class="card-title" id="quizQuestion" style="margin-bottom:14px;line-height:1.4;"></div>
+      <div id="quizOpts"></div>
+      <div id="quizResult" style="font-size:13px;margin-top:10px;min-height:16px;"></div>
+      <button class="quiz-next" id="quizNextBtn" onclick="nextQuiz()">Следующий вопрос →</button>
+    </div>
+  </div>
+
+  <!-- ══ FACTS ══ -->
+  <div class="screen" id="screen-facts">
+    <div class="card">
+      <div class="pill pill-g">📌 Факт дня</div>
+      <div class="art-title">Хрящ — единственная ткань без кровеносных сосудов</div>
+      <div class="art-text">Он питается исключительно через движение: при сжатии синовиальная жидкость уходит, при разжатии — приходит свежая. Именно поэтому сидячий образ жизни так опасен для суставов.</div>
+    </div>
+    <div class="card">
+      <div class="art-img" style="background:linear-gradient(135deg,var(--accent-l),#c6f6d5);">🦴</div>
+      <div class="pill pill-o">Статья · 3 мин</div>
+      <div class="art-title">Почему жидкая форма лучше таблеток</div>
+      <div class="art-meta">Биодоступность · Хондроитин</div>
+      <div class="art-text">В таблетках соляная кислота разрушает большую часть хондроитина — до хряща доходит 30–40%. Жидкая форма начинает всасываться уже в ротовой полости — до 95% молекул.</div>
+      <span class="read-more" onclick="openArticle(0)">Читать полностью →</span>
+    </div>
+    <div class="card">
+      <div class="art-img" style="background:linear-gradient(135deg,var(--blue-l),#bfdbfe);">💧</div>
+      <div class="pill pill-b">Лайфхак · 2 мин</div>
+      <div class="art-title">Вода для суставов: режим важнее количества</div>
+      <div class="art-meta">Привычки · Синовиальная жидкость</div>
+      <div class="art-text">Стакан после пробуждения, стакан каждые 1,5–2 часа — не залпом, а равномерно. Так синовиальная жидкость поддерживает консистенцию весь день.</div>
+      <span class="read-more" onclick="openArticle(1)">Читать полностью →</span>
+    </div>
+    <div class="card">
+      <div class="art-img" style="background:linear-gradient(135deg,var(--gold-l),#fde68a);">🏃</div>
+      <div class="pill pill-g">Движение · 4 мин</div>
+      <div class="art-title">Какой спорт подходит при артрозе</div>
+      <div class="art-meta">Физическая активность · Хрящ</div>
+      <div class="art-text">Ходьба, велотренажёр, бассейн — да. Бег по асфальту, прыжки, глубокие приседания — нет. Главный принцип: нагрузка без ударного компонента.</div>
+      <span class="read-more" onclick="openArticle(2)">Читать полностью →</span>
+    </div>
+    <div class="card">
+      <div class="art-img" style="background:linear-gradient(135deg,var(--purple-l),#ddd6fe);">🌡️</div>
+      <div class="pill pill-p">Сезон · 3 мин</div>
+      <div class="art-title">Ноябрь и суставы: почему холод — враг</div>
+      <div class="art-meta">Тепло · Синовиальная жидкость</div>
+      <div class="art-text">Синовиальная жидкость на холоде густеет — хуже смазывает, больше трения. Наколенники, грелка вечером и разминка до выхода — три простых защиты.</div>
+      <span class="read-more" onclick="openArticle(3)">Читать полностью →</span>
+    </div>
+  </div>
+
+  <!-- ══ PROFILE ══ -->
+  <div class="screen" id="screen-profile">
+    <div class="card" style="text-align:center;padding:22px 18px;">
+      <div style="font-size:50px;margin-bottom:8px;">😊</div>
+      <div style="font-family:'Manrope',sans-serif;font-weight:800;font-size:20px;" id="profileName">Елена</div>
+      <div style="font-size:13px;color:var(--fg3);margin-top:3px;">С нами с 1 октября · Курс 1</div>
+      <div style="margin-top:10px;display:flex;gap:6px;justify-content:center;flex-wrap:wrap;">
+        <span class="badge badge-o">🏆 30 дней стрик</span>
+        <span class="badge badge-g">✅ Регулярный</span>
+      </div>
+    </div>
+    <div class="stat-row">
+      <div class="stat-box"><div class="stat-num">12</div><div class="stat-label">Серия дней</div></div>
+      <div class="stat-box"><div class="stat-num">29</div><div class="stat-label">Всего приёмов</div></div>
+      <div class="stat-box"><div class="stat-num">33%</div><div class="stat-label">Курс</div></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Октябрь — тепловая карта</div>
+      <div id="heatmap" style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:10px;"></div>
+      <div class="week-labels" style="margin-top:6px;"><div>Пн</div><div>Вт</div><div>Ср</div><div>Чт</div><div>Пт</div><div>Сб</div><div>Вс</div></div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="margin-bottom:12px;">🏅 Достижения</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+        <div style="border:1.5px solid var(--accent);border-radius:12px;padding:12px;text-align:center;">
+          <div style="font-size:24px;margin-bottom:4px;">✅</div>
+          <div style="font-size:12px;font-weight:700;color:var(--accent);">7 дней</div>
+          <div style="font-size:11px;color:var(--fg3);">Первая неделя</div>
+        </div>
+        <div style="border:1.5px solid var(--gold);border-radius:12px;padding:12px;text-align:center;">
+          <div style="font-size:24px;margin-bottom:4px;">🔥</div>
+          <div style="font-size:12px;font-weight:700;color:var(--gold);">30 дней</div>
+          <div style="font-size:11px;color:var(--fg3);">Первый месяц</div>
+        </div>
+        <div style="border:1.5px dashed var(--border);border-radius:12px;padding:12px;text-align:center;opacity:.5;">
+          <div style="font-size:24px;margin-bottom:4px;">🎯</div>
+          <div style="font-size:12px;font-weight:700;color:var(--fg3);">1 курс</div>
+          <div style="font-size:11px;color:var(--fg3);">90 дней</div>
+        </div>
+        <div style="border:1.5px dashed var(--border);border-radius:12px;padding:12px;text-align:center;opacity:.5;">
+          <div style="font-size:24px;margin-bottom:4px;">💪</div>
+          <div style="font-size:12px;font-weight:700;color:var(--fg3);">Чемпион</div>
+          <div style="font-size:11px;color:var(--fg3);">180 дней</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="margin-bottom:4px;">🔔 Напоминания</div>
+      <div class="notif-row"><div><div class="notif-label">Утренний приём</div><div class="notif-sub">Каждый день в 8:00</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+      <div class="notif-row"><div><div class="notif-label">Совет дня</div><div class="notif-sub">Каждый день в 9:00</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+      <div class="notif-row"><div><div class="notif-label">Ежедневный чекап</div><div class="notif-sub">Как чувствуют себя суставы?</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+      <div class="notif-row" style="border:none;"><div><div class="notif-label">Пополнить запас</div><div class="notif-sub">За 7 дней до конца флакона</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+    </div>
+    <div class="card" style="background:var(--gold-l);border-color:#f5d87e;">
+      <div class="card-title" style="color:var(--gold);">📦 Пополнить запас</div>
+      <div style="font-size:14px;color:var(--fg2);margin:6px 0 14px;">До конца флакона ~18 дней. Закажите заранее, чтобы не прерывать курс!</div>
+      <button class="btn btn-primary" style="background:var(--gold);" onclick="showToast('Переход в магазин…')">Заказать Артро-Питание</button>
+    </div>
+  </div>
+
+  <!-- ══ CONCEPT ══ -->
+  <div class="screen" id="screen-concept">
+    <div style="margin-bottom:16px;">
+      <div class="card-title" style="font-size:19px;margin-bottom:4px;">💡 Telegram Mini App — концепт</div>
+      <div style="font-size:13px;color:var(--fg3);">QR на флаконе → дневник приёма → повторные покупки</div>
+    </div>
+    <div class="cx-block" style="background:var(--blue-l);border-color:var(--blue);">
+      <h3 style="color:var(--blue);">📦 Точка входа</h3>
+      <ul>
+        <li>QR на флаконе / коробке → Telegram Mini App</li>
+        <li>Онбординг 5 шагов за ~90 сек</li>
+        <li>Без регистрации — вход через Telegram-аккаунт</li>
+      </ul>
+    </div>
+    <div class="cx-block" style="background:var(--accent-l);border-color:var(--accent);">
+      <h3 style="color:var(--accent);">🏠 Дневник (главный экран)</h3>
+      <ul>
+        <li>Стрик — главная мотивация не пропускать</li>
+        <li>Кнопка «Принял» одним тапом + анимация</li>
+        <li>Водный трекер — 8 стаканов, визуально</li>
+        <li>Совет дня из банка 90 советов на курс</li>
+        <li>Неделя-сетка + прогресс-бар 12-недельного курса</li>
+        <li>Счётчик доз флакона</li>
+        <li>Упражнение дня с ротацией</li>
+        <li>Реферальная кнопка: +3 дня за друга</li>
+      </ul>
+    </div>
+    <div class="cx-block" style="background:var(--purple-l);border-color:var(--purple);">
+      <h3 style="color:var(--purple);">📊 Чекап самочувствия</h3>
+      <ul>
+        <li>Ежедневный опрос: 4 варианта состояния суставов</li>
+        <li>График динамики за 7 дней — наглядно</li>
+        <li>Интерактивная карта суставов (10 точек)</li>
+        <li>Вопрос дня — банк 7 вопросов с ротацией</li>
+      </ul>
+    </div>
+    <div class="cx-block" style="background:var(--gold-l);border-color:#f5d87e;">
+      <h3 style="color:var(--gold);">📖 Статьи и факты</h3>
+      <ul>
+        <li>Факт дня — банк 90 фактов на весь курс</li>
+        <li>Мини-библиотека — 20–30 статей по темам</li>
+        <li>Полный текст статьи — модальный слайдер снизу</li>
+        <li>Контент из контент-матрицы ВК/Дзен</li>
+      </ul>
+    </div>
+    <!-- PUSH PREVIEW -->
+    <div class="push-preview">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.6);margin-bottom:12px;">📲 Так выглядит напоминание в Telegram</div>
+      <div class="push-phone">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;opacity:.5;">
+          <div style="width:6px;height:6px;border-radius:50%;background:#fff;"></div>
+          <div style="flex:1;height:2px;background:rgba(255,255,255,.3);border-radius:1px;"></div>
+          <div style="font-size:9px;color:rgba(255,255,255,.5);">09:00</div>
+        </div>
+        <div class="push-notif">
+          <div class="push-app-icon">💊</div>
+          <div class="push-notif-text">
+            <div class="push-notif-title">Артро-Питание 🔥 12 дней</div>
+            <div class="push-notif-body">Елена, доброе утро! Время принять утреннюю порцию. Стрик 12 дней — не останавливайтесь 💪</div>
+            <div class="push-notif-time">сейчас · Telegram</div>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:12px;font-size:12px;color:rgba(255,255,255,.6);text-align:center;">Telegram-пуши бесплатны · CTR выше email в 3–5×</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title" style="margin-bottom:14px;">🔄 Воронка после покупки</div>
+      <div class="funnel-step"><div class="funnel-num">1</div><div><div class="funnel-title">QR на флаконе</div><div class="funnel-desc">Покупатель сканирует → Mini App в Telegram</div></div></div>
+      <div class="funnel-step"><div class="funnel-num">2</div><div><div class="funnel-title">Онбординг 90 сек</div><div class="funnel-desc">5 шагов без регистрации через Telegram-аккаунт</div></div></div>
+      <div class="funnel-step"><div class="funnel-num">3</div><div><div class="funnel-title">Ежедневный пуш</div><div class="funnel-desc">Напоминание + совет + кнопка «Принял»</div></div></div>
+      <div class="funnel-step"><div class="funnel-num">4</div><div><div class="funnel-title">Чекап самочувствия</div><div class="funnel-desc">Динамика видна → доверие к продукту растёт</div></div></div>
+      <div class="funnel-step"><div class="funnel-num">5</div><div><div class="funnel-title">Напоминание «пополнить»</div><div class="funnel-desc">За 7–10 дней до конца флакона → ссылка на заказ</div></div></div>
+      <div class="funnel-step" style="border:none;"><div class="funnel-num">6</div><div><div class="funnel-title">Повторная покупка</div><div class="funnel-desc">Стрик жалко терять → высокая лояльность</div></div></div>
+    </div>
+    <div class="cx-block" style="background:var(--red-l);border-color:var(--red);">
+      <h3 style="color:var(--red);">💰 Коммерческий результат</h3>
+      <ul>
+        <li style="color:var(--fg);">Повторные покупки — напоминание точно в срок</li>
+        <li style="color:var(--fg);">LTV растёт — покупатель привязан к дневнику</li>
+        <li style="color:var(--fg);">Реферал — вирусный стрик-бонус</li>
+        <li style="color:var(--fg);">База Telegram-ID для рассылок</li>
+        <li style="color:var(--fg);">Аналитика: % соблюдения курса, боли, отток</li>
+        <li style="color:var(--fg);">UGC — скриншоты стрика распространяются сами</li>
+      </ul>
+    </div>
+    <div class="cx-block" style="background:var(--bg2);border-color:var(--border);">
+      <h3>⚙️ Технологии (MVP ~1 мес)</h3>
+      <ul>
+        <li>Telegram Bot API + Mini App (WebApp)</li>
+        <li>Frontend: React / Vue — 2–3 недели</li>
+        <li>Backend: Node.js + PostgreSQL</li>
+        <li>Пуши через Telegram Bot — бесплатно</li>
+        <li>Стоимость MVP: ~150–250 тыс. руб.</li>
+        <li>Phase 2: аналитика, реферальная система, A/B</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── DATA ──
+const tips = [
+  "После приёма сделайте 10 мин лёгкой ходьбы — движение доставит питательные вещества в хрящ.",
+  "Выпейте стакан воды прямо сейчас — синовиальная жидкость на 80% состоит из воды.",
+  "7 минут в кровати до подъёма: сгибайте-разгибайте колени 15 раз — хрящ «просыпается».",
+  "Наколенники в холодную погоду — не слабость, а физиология. Тёплый сустав работает лучше.",
+  "20 мин ходьбы каждый день лучше, чем час в воскресенье. Хрящ питается регулярно.",
+  "Велотренажёр — нагрузка без удара, кровоток активен. 15 мин — идеально для суставов.",
+  "Грелка 15 мин вечером на беспокоящий сустав — расслабляет мышцы, улучшает кровоток.",
+  "Стакан воды за 30 мин до еды — помогает усвоению хондроитина и глюкозамина.",
+  "Ноябрь: синовиальная жидкость на холоде густеет. Держите суставы в тепле!",
+  "Бассейн снимает до 90% нагрузки веса тела — лучший вид движения при болях.",
+];
+const exercises = [
+  {name:"🔄 Вращение голеностопа · 5 мин", text:"Сидя на стуле, поднимите одну ногу и медленно вращайте стопой — 10 раз по часовой, 10 раз против. Смените ногу. Делайте сразу после приёма."},
+  {name:"🦵 Сгибание колена лёжа · 7 мин", text:"Лёжа на спине, медленно подтяните колено к груди, удержите 5 сек, опустите. По 10 раз на каждую ногу. Снимает утреннюю скованность."},
+  {name:"✋ Вращение запястий · 3 мин", text:"Сожмите кулаки и медленно вращайте запястьями — 15 раз по часовой, 15 раз против. Повторите с открытыми ладонями."},
+  {name:"🦶 Перекат пятка–носок · 5 мин", text:"Стоя у стены (держитесь для равновесия), перекатывайтесь с пяток на носки — 20 раз. Активирует голеностоп и улучшает кровоток."},
+  {name:"🔙 Наклоны шеи · 3 мин", text:"Медленно наклоняйте голову вперёд-назад, вправо-влево, по 8 раз. Снимает нагрузку с шейного отдела позвоночника."},
+];
+
+const articles = [
+  {
+    emoji:"🦴", bg:"linear-gradient(135deg,var(--accent-l),#c6f6d5)",
+    pill:"Биодоступность · 3 мин",
+    title:"Почему жидкая форма лучше таблеток",
+    body:`<p>Хондроитин и глюкозамин — ключевые строительные материалы суставного хряща. Но чтобы работать, они должны добраться до цели в неповреждённом виде.</p>
+<h3>Что происходит с таблеткой</h3>
+<p>Таблетка попадает в желудок, где соляная кислота (pH 1,5–3,5) разрушает её содержимое. Затем кишечник, печень — первичный метаболизм. До хряща доходит <strong>30–40%</strong> активных молекул в лучшем случае.</p>
+<h3>Как работает жидкая форма</h3>
+<p>Молекулы хондроитина в жидком виде частично всасываются уже в ротовой полости через слизистую. Меньший размер частиц = выше биодоступность. Исследования показывают усвоение до <strong>95%</strong>.</p>
+<div class="highlight">💡 Совет: принимайте Артро-Питание, не запивая сразу большим количеством воды — дайте жидкости задержаться во рту 30–60 секунд.</div>
+<p>Ещё одно преимущество: жидкая форма удобна для пожилых людей, которым трудно глотать таблетки. И никаких вспомогательных веществ — только активные компоненты.</p>`
+  },
+  {
+    emoji:"💧", bg:"linear-gradient(135deg,var(--blue-l),#bfdbfe)",
+    pill:"Привычки · 2 мин",
+    title:"Вода для суставов: режим важнее количества",
+    body:`<p>Синовиальная жидкость — «смазка» суставов — на 80% состоит из воды. Её нехватка напрямую ведёт к трению и истиранию хряща.</p>
+<h3>Правильный режим</h3>
+<p>Стакан сразу после пробуждения — запускает обмен веществ и «разжижает» синовиальную жидкость после ночного отдыха. Затем каждые 1,5–2 часа, небольшими глотками: организм усваивает равномерную подачу лучше, чем большие объёмы сразу.</p>
+<h3>Простые лайфхаки</h3>
+<p>Поставьте бутылку 0,5 л на рабочий стол. Задача: выпить до обеда и поставить новую. Визуальный якорь работает лучше будильников.</p>
+<div class="highlight">🎯 Норма: 6–8 стаканов в день. При активных занятиях спортом — до 10. Кофе и чай частично обезвоживают — добавляйте стакан воды за каждую чашку.</div>
+<p>В нашем дневнике есть трекер воды — нажимайте на стакан каждый раз, когда выпили, и следите за нормой!</p>`
+  },
+  {
+    emoji:"🏃", bg:"linear-gradient(135deg,var(--gold-l),#fde68a)",
+    pill:"Физическая активность · 4 мин",
+    title:"Какой спорт подходит при артрозе",
+    body:`<p>При артрозе движение необходимо — но выбор нагрузки критически важен. Главное правило: <strong>нагрузка без ударного компонента</strong>.</p>
+<h3>✅ Подходит</h3>
+<p><strong>Ходьба</strong> — 20–30 мин в день, по ровной поверхности, в обуви с амортизацией.</p>
+<p><strong>Велотренажёр</strong> — нет удара, есть кровоток. 15–20 мин при умеренном сопротивлении.</p>
+<p><strong>Бассейн</strong> — вода снимает до 90% нагрузки веса тела. Плавание и аквааэробика — оптимально.</p>
+<h3>❌ Не подходит</h3>
+<p>Бег по асфальту, прыжки, степ-аэробика, глубокие приседания с весом — ударная нагрузка разрушает хрящ быстрее, чем он успевает восстанавливаться.</p>
+<div class="highlight">🏆 Принцип: 20 минут каждый день лучше, чем час в воскресенье. Регулярность важнее интенсивности. Хрящ питается только во время движения.</div>`
+  },
+  {
+    emoji:"🌡️", bg:"linear-gradient(135deg,var(--purple-l),#ddd6fe)",
+    pill:"Сезонный уход · 3 мин",
+    title:"Ноябрь и суставы: почему холод — враг",
+    body:`<p>С понижением температуры суставы начинают болеть сильнее. За этим стоит физиология.</p>
+<h3>Почему холод усиливает боль</h3>
+<p>Синовиальная жидкость при охлаждении повышает вязкость — буквально «загустевает». Смазывающие свойства падают, трение в суставе растёт. Мышцы вокруг сустава тоже рефлекторно напрягаются от холода, увеличивая нагрузку.</p>
+<h3>Три способа защититься</h3>
+<p><strong>Наколенники под брюки</strong> — согревают без ограничения движения. Современные модели незаметны под одеждой.</p>
+<p><strong>Грелка вечером</strong> — 15 минут на беспокоящий сустав перед сном расслабляет мышцы и улучшает кровоток.</p>
+<p><strong>Разминка перед выходом</strong> — 5 минут вращений и сгибаний «разогревают» синовиальную жидкость до нужной консистенции.</p>
+<div class="highlight">❄️→🌡️ Один ноябрь внимания к суставам — и зима без обострений. Продолжайте курс!</div>`
+  }
+];
+
+const quizBank = [
+  {q:"С какого момента начинает работать хондропротектор?", opts:["Через 1–3 дня","Через 2–3 недели","Через 4–6 недель","Через полгода"], c:2,
+   exp:"Хондропротекторы работают накопительно: первый заметный эффект обычно наступает через 4–6 недель регулярного приёма."},
+  {q:"Сколько воды нужно суставам ежедневно?", opts:["2–3 стакана","4–5 стаканов","6–8 стаканов","10–12 стаканов"], c:2,
+   exp:"Оптимальная норма — 6–8 стаканов в день. Синовиальная жидкость на 80% состоит из воды."},
+  {q:"Чем питается суставной хрящ?", opts:["Через кровеносные сосуды","Через синовиальную жидкость при движении","Через нервные окончания","Через лимфу"], c:1,
+   exp:"Хрящ не имеет сосудов — он питается синовиальной жидкостью, которая «прокачивается» при движении. Поэтому гиподинамия так вредна."},
+  {q:"Какой вид спорта безопасен при артрозе?", opts:["Бег по асфальту","Прыжки со скакалкой","Плавание и аквааэробика","Степ-аэробика"], c:2,
+   exp:"Вода снимает до 90% нагрузки веса тела — плавание и аквааэробика идеальны при артрозе. Ударные нагрузки противопоказаны."},
+  {q:"Почему жидкая форма препарата лучше таблеток?", opts:["Быстрее проходит через желудок","Начинает всасываться уже в ротовой полости","Содержит больше активных веществ","Дольше хранится"], c:1,
+   exp:"В жидкой форме молекулы хондроитина частично всасываются через слизистую рта ещё до желудка. Биодоступность — до 95% против 30–40% у таблеток."},
+  {q:"Что происходит с синовиальной жидкостью на холоде?", opts:["Становится жиже","Загустевает и хуже смазывает","Её становится больше","Она замерзает"], c:1,
+   exp:"При охлаждении синовиальная жидкость густеет — смазывающие свойства падают, трение в суставе растёт. Поэтому суставы болят сильнее зимой."},
+  {q:"Через сколько недель курса рекомендуется делать контрольный осмотр у врача?", opts:["Через 2 недели","Через 4–6 недель","Через 6 месяцев","Осмотр не нужен"], c:1,
+   exp:"Через 4–6 недель уже можно оценить первые результаты и при необходимости скорректировать курс совместно с врачом."},
+];
+
+const jointAdvice = {
+  ok: "Сустав в хорошем состоянии — продолжайте курс и ежедневную активность.",
+  mild: "Лёгкий дискомфорт. Добавьте 5 мин тепла вечером и следите за водным режимом.",
+  pain: "Есть боль — снизьте нагрузку, согрейте сустав, не пропускайте приём. При усилении — к врачу.",
+  none: "Состояние не отмечено. Нажмите ещё раз, чтобы выбрать.",
+};
+
+// ── STATE ──
+let exIdx = 0;
+let waterFilled = 3;
+const waterTotal = 8;
+let feelData = [2,1,2,3,2,3,3];
+let quizIdx = 0;
+let quizAnswered = false;
+const weekDone = [1,1,1,0,1,1,0];
+const todayIdx = 5; // Saturday (index 0=Mon)
+
+// ── ONBOARDING ──
+let ob = 0;
+function nextOb(){
+  document.getElementById('ob'+ob).classList.remove('active');
+  document.getElementById('dot'+ob).classList.remove('active');
+  ob++;
+  if(ob < 5){
+    document.getElementById('ob'+ob).classList.add('active');
+    document.getElementById('dot'+ob).classList.add('active');
+  }
+}
+function selectOne(selector, el){
+  document.querySelectorAll(selector+' .intake-btn').forEach(b=>b.classList.remove('done'));
+  el.classList.add('done');
+}
+function enterApp(){
+  const name = document.getElementById('nameInput').value.trim() || 'Елена';
+  document.getElementById('profileName').textContent = name;
+  document.getElementById('onboarding').style.display='none';
+  document.getElementById('app').style.display='block';
+  initAll();
+}
+
+// ── TABS ──
+function showTab(id, el){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('screen-'+id).classList.add('active');
+  el.classList.add('active');
+  if(id==='feel'){
+    const badge = document.getElementById('feelBadge');
+    if(badge) badge.style.display='none';
+  }
+}
+
+// ── INIT ──
+function initAll(){
+  document.getElementById('dailyTip').textContent = tips[Math.floor(Math.random()*tips.length)];
+  renderWeek();
+  renderBottle();
+  renderExercise();
+  renderFeel();
+  renderHeatmap();
+  renderWater();
+  renderQuiz();
+}
+
+// ── WEEK ──
+function renderWeek(){
+  const grid = document.getElementById('weekGrid');
+  grid.innerHTML = weekDone.map((d,i)=>`
+    <div class="week-day${d?' done':''}${i===todayIdx?' today':''}">
+      ${d?'✓':'·'}
+    </div>`).join('');
+  const cnt = weekDone.reduce((a,v)=>a+v,0);
+  document.getElementById('weekSub').textContent = cnt+' из 7 дней — '+
+    (cnt>=6?'превосходно!':cnt>=4?'продолжайте!':'ещё можно лучше 💪');
+}
+
+// ── BOTTLE ──
+function renderBottle(){
+  const total=30, used=9;
+  document.getElementById('bottleDots').innerHTML =
+    Array.from({length:total},(_,i)=>`<div class="bottle-dot${i<used?' empty':''}"></div>`).join('');
+}
+
+// ── EXERCISE ──
+function renderExercise(){
+  const ex = exercises[exIdx % exercises.length];
+  document.getElementById('exName').textContent = ex.name;
+  document.getElementById('exText').textContent = ex.text;
+}
+function nextExercise(){
+  exIdx++;
+  renderExercise();
+  const btn = document.getElementById('exBtn');
+  btn.classList.remove('pop');
+  void btn.offsetWidth;
+  btn.classList.add('pop');
+  setTimeout(()=>btn.classList.remove('pop'),400);
+  showToast('Упражнение сменено ✓');
+}
+
+// ── INTAKE ──
+function toggleIntake(id, el){
+  el.classList.toggle('done');
+  const done = el.classList.contains('done');
+  el.querySelector('.big').textContent = done?'✅':'⏳';
+  const mDone = document.getElementById('btn-morning').classList.contains('done');
+  const eDone = document.getElementById('btn-evening').classList.contains('done');
+  document.getElementById('intakeMsg').textContent =
+    (mDone&&eDone) ? '🎉 Оба приёма сегодня — отлично!' : done ? '✓ Отмечено, так держать!' : '';
+  if(mDone&&eDone) setTimeout(animateStreak,200);
+}
+
+// ── WATER ──
+function renderWater(){
+  const track = document.getElementById('waterTrack');
+  track.innerHTML = Array.from({length:waterTotal},(_,i)=>
+    `<div class="water-cup${i<waterFilled?' filled':''}" onclick="toggleWater(${i})">💧</div>`
+  ).join('');
+  document.getElementById('waterCount').textContent = waterFilled+' / '+waterTotal;
+  const left = waterTotal - waterFilled;
+  document.getElementById('waterTip').textContent = left>0
+    ? `Ещё ${left} стакан${left===1?'':left<5?'а':'ов'} до нормы — синовиальная жидкость скажет спасибо!`
+    : '✅ Норма воды выполнена! Отличный день для суставов.';
+}
+function toggleWater(i){
+  waterFilled = (i < waterFilled) ? i : i+1;
+  renderWater();
+  if(waterFilled===waterTotal) showToast('💧 Норма воды выполнена!');
+}
+
+// ── STREAK ──
+function animateStreak(){
+  const el = document.getElementById('streakNum');
+  el.classList.remove('streak-pop');
+  void el.offsetWidth;
+  el.classList.add('streak-pop');
+  setTimeout(()=>el.classList.remove('streak-pop'),500);
+}
+
+// ── FEEL ──
+function renderFeel(){
+  const chart = document.getElementById('feelChart');
+  if(!chart) return;
+  const colors=['#fca5a5','#fcd34d','#86efac','#4ade80'];
+  const emojis=['😣','😕','😐','😊'];
+  chart.innerHTML = feelData.map(v=>`
+    <div style="display:flex;flex-direction:column;align-items:center;flex:1;gap:3px;">
+      <div style="font-size:11px;">${emojis[v]}</div>
+      <div style="width:100%;height:${Math.round((v/3)*68)}px;border-radius:6px 6px 0 0;
+           background:${colors[v]};transition:height .4s;min-height:4px;"></div>
+    </div>`).join('');
+}
+function setFeel(val,el){
+  document.querySelectorAll('.feel-btn').forEach(b=>b.classList.remove('selected'));
+  el.classList.add('selected');
+  const day = new Date().getDay();
+  const idx = day===0 ? 6 : day-1;
+  feelData[idx]=val;
+  renderFeel();
+  const msgs=[
+    'Понял. Следим за динамикой. Тепло и режим помогут.',
+    'Дискомфорт — хрящу нужна поддержка. Не пропускайте приём.',
+    'Нормально — хороший знак, курс работает.',
+    'Отлично! Записал в динамику. Продолжайте!'
+  ];
+  document.getElementById('feelThanks').textContent = msgs[val];
+}
+
+// ── JOINT MAP ──
+function cycleJoint(el){
+  const states=['none','ok','mild','pain'];
+  const cur = states.findIndex(s=>el.classList.contains(s));
+  const next = (cur+1) % states.length;
+  states.forEach(s=>el.classList.remove(s));
+  el.classList.add(states[next]);
+  document.getElementById('jointInfo').innerHTML =
+    `<strong>${el.dataset.name}:</strong> ${jointAdvice[states[next]]}`;
+}
+
+// ── QUIZ ──
+function renderQuiz(){
+  const q = quizBank[quizIdx % quizBank.length];
+  document.getElementById('quizQuestion').textContent = q.q;
+  document.getElementById('quizOpts').innerHTML = q.opts.map((o,i)=>
+    `<div class="quiz-opt" onclick="answerQuiz(this,${i===q.c},${q.c})">${o}</div>`
+  ).join('');
+  document.getElementById('quizResult').textContent = '';
+  document.getElementById('quizNextBtn').style.display = 'none';
+  quizAnswered = false;
+}
+function answerQuiz(el, correct, correctIdx){
+  if(quizAnswered) return;
+  quizAnswered = true;
+  el.classList.add(correct?'correct':'wrong');
+  if(!correct){
+    document.querySelectorAll('.quiz-opt')[correctIdx].classList.add('correct');
+  }
+  const q = quizBank[quizIdx % quizBank.length];
+  document.getElementById('quizResult').textContent = (correct?'✓ Верно! ':'✗ Неверно. ') + q.exp;
+  document.getElementById('quizNextBtn').style.display = 'block';
+}
+function nextQuiz(){
+  quizIdx++;
+  renderQuiz();
+  showToast('Следующий вопрос 🎯');
+}
+
+// ── HEATMAP ──
+function renderHeatmap(){
+  const done=[1,1,0,1,1,1,0,1,1,1,1,0,1,1,1,1,1,0,1,1,1,0,1,1,1,1,1,1,0,1,1];
+  const hm = document.getElementById('heatmap');
+  if(!hm) return;
+  hm.innerHTML = Array.from({length:3},()=>'<div style="aspect-ratio:1;"></div>').join('')
+    + done.map((d,i)=>`
+      <div style="aspect-ratio:1;border-radius:4px;background:${d?'var(--accent)':'var(--border)'};
+           opacity:${d?1:.35};display:flex;align-items:center;justify-content:center;
+           font-size:9px;color:${d?'#fff':'var(--fg3)'};">${i+1}</div>`).join('');
+}
+
+// ── ARTICLE MODAL ──
+function openArticle(idx){
+  const a = articles[idx];
+  document.getElementById('modalImg').style.background = a.bg;
+  document.getElementById('modalImg').textContent = a.emoji;
+  document.getElementById('modalPill').textContent = a.pill;
+  document.getElementById('modalTitle').textContent = a.title;
+  document.getElementById('modalBody').innerHTML = a.body;
+  document.getElementById('modalOverlay').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function handleModalClick(e){
+  if(e.target === document.getElementById('modalOverlay')) closeModal();
+}
+function closeModal(){
+  document.getElementById('modalOverlay').classList.remove('open');
+  document.body.style.overflow='';
+}
+
+// ── TOAST ──
+let toastTimer;
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>t.classList.remove('show'), 2400);
+}
+
+// ── SHARE ──
+function shareApp(){ showToast('✓ Ссылка скопирована!'); }
+</script>
+</body>
+</html>
