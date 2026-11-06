@@ -131,6 +131,12 @@ body{background:var(--bg);color:var(--fg);font-family:'Inter',sans-serif;font-si
 .btn-primary:hover{background:var(--accent-d);}
 .btn-ghost{background:var(--bg);color:var(--fg2);border:1.5px solid var(--border);margin-top:8px;}
 
+/* TIME PICKER custom */
+.time-custom-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+.time-custom-row input[type="time"]{flex:1;padding:12px 14px;border-radius:12px;border:1.5px solid var(--border);background:var(--bg);color:var(--fg);font-size:15px;font-family:inherit;outline:none;}
+.time-custom-row input[type="time"]:focus{border-color:var(--accent);}
+.time-custom-row .btn-primary{flex:0 0 auto;width:auto;padding:12px 18px;}
+
 .stat-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px;}
 .stat-box{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:12px 8px;text-align:center;}
 .stat-num{font-family:'Manrope',sans-serif;font-weight:800;font-size:24px;color:var(--accent);}
@@ -235,12 +241,17 @@ body{background:var(--bg);color:var(--fg);font-family:'Inter',sans-serif;font-si
     <div class="ob-icon">🔔</div>
     <div class="ob-title">Время напоминания</div>
     <div class="ob-text">Когда напомнить принять Артро-Питание?</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:18px;" id="timePicker">
-      <div class="intake-btn" onclick="selectOne('#timePicker',this)"><span class="big">🌅</span>Утро 8:00</div>
-      <div class="intake-btn" onclick="selectOne('#timePicker',this)"><span class="big">☀️</span>День 12:00</div>
-      <div class="intake-btn" onclick="selectOne('#timePicker',this)"><span class="big">🌆</span>Вечер 18:00</div>
-      <div class="intake-btn" onclick="selectOne('#timePicker',this)"><span class="big">🌙</span>Ночь 21:00</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;" id="timePicker">
+      <div class="intake-btn" onclick="selectTime(this,'08:00')"><span class="big">🌅</span>Утро 8:00</div>
+      <div class="intake-btn" onclick="selectTime(this,'12:00')"><span class="big">☀️</span>День 12:00</div>
+      <div class="intake-btn" onclick="selectTime(this,'18:00')"><span class="big">🌆</span>Вечер 18:00</div>
+      <div class="intake-btn" onclick="selectTime(this,'21:00')"><span class="big">🌙</span>Ночь 21:00</div>
     </div>
+    <div class="time-custom-row">
+      <input type="time" id="customTimeInput" placeholder="Своё время">
+      <button class="btn btn-primary" onclick="selectCustomTime()" style="white-space:nowrap;">Выбрать</button>
+    </div>
+    <div id="selectedTimeDisplay" style="text-align:center;font-size:13px;color:var(--accent);min-height:20px;margin-bottom:8px;font-weight:600;"></div>
     <button class="btn btn-primary" onclick="nextOb()">Продолжить</button>
   </div>
   <div class="ob-step" id="ob4">
@@ -248,9 +259,9 @@ body{background:var(--bg);color:var(--fg);font-family:'Inter',sans-serif;font-si
     <div class="ob-title">Когда открыли флакон?</div>
     <div class="ob-text">Отследим, когда пора пополнить запас</div>
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:18px;" id="bottlePicker">
-      <div class="intake-btn" onclick="selectOne('#bottlePicker',this)"><span class="big">🆕</span>Сегодня</div>
-      <div class="intake-btn" onclick="selectOne('#bottlePicker',this)"><span class="big">📅</span>~неделю</div>
-      <div class="intake-btn" onclick="selectOne('#bottlePicker',this)"><span class="big">🗓️</span>~2 недели</div>
+      <div class="intake-btn" onclick="selectBottle(this,0)"><span class="big">🆕</span>Сегодня</div>
+      <div class="intake-btn" onclick="selectBottle(this,7)"><span class="big">📅</span>~неделю</div>
+      <div class="intake-btn" onclick="selectBottle(this,14)"><span class="big">🗓️</span>~2 недели</div>
     </div>
     <button class="btn btn-primary" onclick="enterApp()">Начать дневник ✓</button>
     <button class="btn btn-ghost" onclick="enterApp()">Пропустить</button>
@@ -271,8 +282,8 @@ body{background:var(--bg);color:var(--fg);font-family:'Inter',sans-serif;font-si
   <div class="screen active" id="screen-home">
     <div class="streak-banner" id="streakBanner" onclick="animateStreak()">
       <div class="slabel">🔥 Серия дней</div>
-      <div class="snum" id="streakNum">12</div>
-      <div class="ssub" id="streakSub">дней подряд — отличный результат!</div>
+      <div class="snum" id="streakNum">0</div>
+      <div class="ssub" id="streakSub">дней подряд</div>
     </div>
 
     <div class="tip-card">
@@ -284,7 +295,7 @@ body{background:var(--bg);color:var(--fg);font-family:'Inter',sans-serif;font-si
       <div class="card-title">Приём сегодня</div>
       <div class="card-sub" style="margin-bottom:12px;">Отметьте одним тапом</div>
       <div class="today-block">
-        <div class="intake-btn done" id="btn-morning" onclick="toggleIntake('morning',this)"><span class="big">✅</span>Утром</div>
+        <div class="intake-btn" id="btn-morning" onclick="toggleIntake('morning',this)"><span class="big">⏳</span>Утром</div>
         <div class="intake-btn" id="btn-evening" onclick="toggleIntake('evening',this)"><span class="big">⏳</span>Вечером</div>
       </div>
       <div id="intakeMsg" style="font-size:13px;color:var(--accent);text-align:center;min-height:18px;"></div>
@@ -294,7 +305,7 @@ body{background:var(--bg);color:var(--fg);font-family:'Inter',sans-serif;font-si
     <div class="card">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
         <div class="card-title" style="margin:0;">💧 Вода сегодня</div>
-        <div id="waterCount" style="font-family:'Manrope',sans-serif;font-weight:800;font-size:20px;color:var(--blue);">3 / 8</div>
+        <div id="waterCount" style="font-family:'Manrope',sans-serif;font-weight:800;font-size:20px;color:var(--blue);">0 / 8</div>
       </div>
       <div class="card-sub" style="margin-bottom:10px;">Нажмите на стакан — отметить выпитый</div>
       <div class="water-track" id="waterTrack"></div>
@@ -312,8 +323,8 @@ body{background:var(--bg);color:var(--fg);font-family:'Inter',sans-serif;font-si
     <!-- COURSE -->
     <div class="card">
       <div class="card-title">Прогресс курса</div>
-      <div class="card-sub" style="margin-bottom:8px;">Неделя 4 из 12</div>
-      <div class="prog-wrap"><div class="prog-bar" style="width:33%"></div></div>
+      <div class="card-sub" style="margin-bottom:8px;" id="courseWeekLabel">Неделя 1 из 12</div>
+      <div class="prog-wrap"><div class="prog-bar" id="courseBar" style="width:0%"></div></div>
       <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--fg3);">
         <span>Старт</span><span>Первый эффект ~6 нед.</span><span>Финиш</span>
       </div>
@@ -322,12 +333,12 @@ body{background:var(--bg);color:var(--fg);font-family:'Inter',sans-serif;font-si
     <!-- BOTTLE -->
     <div class="card">
       <div class="card-title">📦 Флакон</div>
-      <div class="card-sub" style="margin-bottom:10px;">Осталось ~21 доза · ~18 дней</div>
+      <div class="card-sub" style="margin-bottom:10px;" id="bottleSubText">Осталось ~30 доз</div>
       <div class="bottle-wrap">
         <div class="bottle-visual" id="bottleDots"></div>
         <div style="font-size:28px;">💊</div>
       </div>
-      <div style="font-size:13px;color:var(--fg3);">Израсходовано: <strong style="color:var(--accent)">9 из 30 доз</strong></div>
+      <div style="font-size:13px;color:var(--fg3);">Израсходовано: <strong style="color:var(--accent)" id="bottleUsedText">0 из 30 доз</strong></div>
     </div>
 
     <!-- EXERCISE -->
@@ -385,16 +396,21 @@ body{background:var(--bg);color:var(--fg);font-family:'Inter',sans-serif;font-si
             <rect x="26" y="92" width="12" height="70" rx="6" fill="currentColor"/>
             <rect x="42" y="92" width="12" height="70" rx="6" fill="currentColor"/>
           </svg>
-          <div class="jdot ok" style="left:30%;top:22%;transform:translate(-50%,-50%);" data-name="Плечо Л" onclick="cycleJoint(this)"></div>
-          <div class="jdot ok" style="left:70%;top:22%;transform:translate(-50%,-50%);" data-name="Плечо П" onclick="cycleJoint(this)"></div>
-          <div class="jdot mild" style="left:18%;top:42%;transform:translate(-50%,-50%);" data-name="Локоть Л" onclick="cycleJoint(this)"></div>
-          <div class="jdot ok" style="left:82%;top:42%;transform:translate(-50%,-50%);" data-name="Локоть П" onclick="cycleJoint(this)"></div>
-          <div class="jdot ok" style="left:15%;top:60%;transform:translate(-50%,-50%);" data-name="Запястье Л" onclick="cycleJoint(this)"></div>
-          <div class="jdot ok" style="left:85%;top:60%;transform:translate(-50%,-50%);" data-name="Запястье П" onclick="cycleJoint(this)"></div>
-          <div class="jdot pain" style="left:35%;top:72%;transform:translate(-50%,-50%);" data-name="Колено Л" onclick="cycleJoint(this)"></div>
-          <div class="jdot pain" style="left:65%;top:72%;transform:translate(-50%,-50%);" data-name="Колено П" onclick="cycleJoint(this)"></div>
-          <div class="jdot mild" style="left:32%;top:88%;transform:translate(-50%,-50%);" data-name="Голеностоп Л" onclick="cycleJoint(this)"></div>
-          <div class="jdot ok" style="left:68%;top:88%;transform:translate(-50%,-50%);" data-name="Голеностоп П" onclick="cycleJoint(this)"></div>
+          <!-- Плечи — верх туловища ~17-19% -->
+          <div class="jdot ok" style="left:28%;top:17%;transform:translate(-50%,-50%);" data-name="Плечо Л" onclick="cycleJoint(this)"></div>
+          <div class="jdot ok" style="left:72%;top:17%;transform:translate(-50%,-50%);" data-name="Плечо П" onclick="cycleJoint(this)"></div>
+          <!-- Локти — середина руки ~38% -->
+          <div class="jdot mild" style="left:10%;top:38%;transform:translate(-50%,-50%);" data-name="Локоть Л" onclick="cycleJoint(this)"></div>
+          <div class="jdot ok" style="left:90%;top:38%;transform:translate(-50%,-50%);" data-name="Локоть П" onclick="cycleJoint(this)"></div>
+          <!-- Запястья — низ руки ~54% -->
+          <div class="jdot ok" style="left:8%;top:54%;transform:translate(-50%,-50%);" data-name="Запястье Л" onclick="cycleJoint(this)"></div>
+          <div class="jdot ok" style="left:92%;top:54%;transform:translate(-50%,-50%);" data-name="Запястье П" onclick="cycleJoint(this)"></div>
+          <!-- Колени — низ ног ~74% -->
+          <div class="jdot pain" style="left:34%;top:74%;transform:translate(-50%,-50%);" data-name="Колено Л" onclick="cycleJoint(this)"></div>
+          <div class="jdot pain" style="left:66%;top:74%;transform:translate(-50%,-50%);" data-name="Колено П" onclick="cycleJoint(this)"></div>
+          <!-- Голеностопы — самый низ ~91% -->
+          <div class="jdot mild" style="left:32%;top:91%;transform:translate(-50%,-50%);" data-name="Голеностоп Л" onclick="cycleJoint(this)"></div>
+          <div class="jdot ok" style="left:68%;top:91%;transform:translate(-50%,-50%);" data-name="Голеностоп П" onclick="cycleJoint(this)"></div>
         </div>
         <div style="flex:1;">
           <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;">
@@ -464,34 +480,34 @@ body{background:var(--bg);color:var(--fg);font-family:'Inter',sans-serif;font-si
   <div class="screen" id="screen-profile">
     <div class="card" style="text-align:center;padding:22px 18px;">
       <div style="font-size:50px;margin-bottom:8px;">😊</div>
-      <div style="font-family:'Manrope',sans-serif;font-weight:800;font-size:20px;" id="profileName">Елена</div>
-      <div style="font-size:13px;color:var(--fg3);margin-top:3px;">С нами с 1 октября · Курс 1</div>
+      <div style="font-family:'Manrope',sans-serif;font-weight:800;font-size:20px;" id="profileName">—</div>
+      <div style="font-size:13px;color:var(--fg3);margin-top:3px;" id="profileSince">С нами с сегодня · Курс 1</div>
       <div style="margin-top:10px;display:flex;gap:6px;justify-content:center;flex-wrap:wrap;">
-        <span class="badge badge-o">🏆 30 дней стрик</span>
+        <span class="badge badge-o" id="streakBadge">🏆 0 дней стрик</span>
         <span class="badge badge-g">✅ Регулярный</span>
       </div>
     </div>
     <div class="stat-row">
-      <div class="stat-box"><div class="stat-num">12</div><div class="stat-label">Серия дней</div></div>
-      <div class="stat-box"><div class="stat-num">29</div><div class="stat-label">Всего приёмов</div></div>
-      <div class="stat-box"><div class="stat-num">33%</div><div class="stat-label">Курс</div></div>
+      <div class="stat-box"><div class="stat-num" id="statStreak">0</div><div class="stat-label">Серия дней</div></div>
+      <div class="stat-box"><div class="stat-num" id="statTotal">0</div><div class="stat-label">Всего приёмов</div></div>
+      <div class="stat-box"><div class="stat-num" id="statCourse">0%</div><div class="stat-label">Курс</div></div>
     </div>
     <div class="card">
-      <div class="card-title">Октябрь — тепловая карта</div>
+      <div class="card-title">Этот месяц — тепловая карта</div>
       <div id="heatmap" style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:10px;"></div>
       <div class="week-labels" style="margin-top:6px;"><div>Пн</div><div>Вт</div><div>Ср</div><div>Чт</div><div>Пт</div><div>Сб</div><div>Вс</div></div>
     </div>
     <div class="card">
       <div class="card-title" style="margin-bottom:12px;">🏅 Достижения</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-        <div style="border:1.5px solid var(--accent);border-radius:12px;padding:12px;text-align:center;">
+        <div id="ach7" style="border:1.5px dashed var(--border);border-radius:12px;padding:12px;text-align:center;opacity:.5;">
           <div style="font-size:24px;margin-bottom:4px;">✅</div>
-          <div style="font-size:12px;font-weight:700;color:var(--accent);">7 дней</div>
+          <div style="font-size:12px;font-weight:700;color:var(--fg3);">7 дней</div>
           <div style="font-size:11px;color:var(--fg3);">Первая неделя</div>
         </div>
-        <div style="border:1.5px solid var(--gold);border-radius:12px;padding:12px;text-align:center;">
+        <div id="ach30" style="border:1.5px dashed var(--border);border-radius:12px;padding:12px;text-align:center;opacity:.5;">
           <div style="font-size:24px;margin-bottom:4px;">🔥</div>
-          <div style="font-size:12px;font-weight:700;color:var(--gold);">30 дней</div>
+          <div style="font-size:12px;font-weight:700;color:var(--fg3);">30 дней</div>
           <div style="font-size:11px;color:var(--fg3);">Первый месяц</div>
         </div>
         <div style="border:1.5px dashed var(--border);border-radius:12px;padding:12px;text-align:center;opacity:.5;">
@@ -508,14 +524,14 @@ body{background:var(--bg);color:var(--fg);font-family:'Inter',sans-serif;font-si
     </div>
     <div class="card">
       <div class="card-title" style="margin-bottom:4px;">🔔 Напоминания</div>
-      <div class="notif-row"><div><div class="notif-label">Утренний приём</div><div class="notif-sub">Каждый день в 8:00</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+      <div class="notif-row"><div><div class="notif-label">Утренний приём</div><div class="notif-sub" id="reminderTimeSub">Каждый день в 8:00</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
       <div class="notif-row"><div><div class="notif-label">Совет дня</div><div class="notif-sub">Каждый день в 9:00</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
       <div class="notif-row"><div><div class="notif-label">Ежедневный чекап</div><div class="notif-sub">Как чувствуют себя суставы?</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
       <div class="notif-row" style="border:none;"><div><div class="notif-label">Пополнить запас</div><div class="notif-sub">За 7 дней до конца флакона</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
     </div>
     <div class="card" style="background:var(--gold-l);border-color:#f5d87e;">
       <div class="card-title" style="color:var(--gold);">📦 Пополнить запас</div>
-      <div style="font-size:14px;color:var(--fg2);margin:6px 0 14px;">До конца флакона ~18 дней. Закажите заранее, чтобы не прерывать курс!</div>
+      <div style="font-size:14px;color:var(--fg2);margin:6px 0 14px;" id="refillText">До конца флакона ~30 дней. Закажите заранее, чтобы не прерывать курс!</div>
       <button class="btn btn-primary" style="background:var(--gold);" onclick="showToast('Переход в магазин…')">Заказать Артро-Питание</button>
     </div>
   </div>
@@ -577,8 +593,8 @@ body{background:var(--bg);color:var(--fg);font-family:'Inter',sans-serif;font-si
         <div class="push-notif">
           <div class="push-app-icon">💊</div>
           <div class="push-notif-text">
-            <div class="push-notif-title">Артро-Питание 🔥 12 дней</div>
-            <div class="push-notif-body">Елена, доброе утро! Время принять утреннюю порцию. Стрик 12 дней — не останавливайтесь 💪</div>
+            <div class="push-notif-title" id="pushTitle">Артро-Питание 🔥 0 дней</div>
+            <div class="push-notif-body" id="pushBody">Доброе утро! Время принять утреннюю порцию. Начните свою серию — не останавливайтесь 💪</div>
             <div class="push-notif-time">сейчас · Telegram</div>
           </div>
         </div>
@@ -719,18 +735,54 @@ const jointAdvice = {
   none: "Состояние не отмечено. Нажмите ещё раз, чтобы выбрать.",
 };
 
+// ── LOCALSTORAGE ──
+const STORAGE_KEY = 'artro_v2';
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch(e) { return null; }
+}
+
+function saveState() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch(e) {}
+}
+
+function todayStr() {
+  return new Date().toISOString().slice(0,10);
+}
+
 // ── STATE ──
-let exIdx = 0;
-let waterFilled = 3;
-const waterTotal = 8;
-let feelData = [2,1,2,3,2,3,3];
-let quizIdx = 0;
-let quizAnswered = false;
-const weekDone = [1,1,1,0,1,1,0];
-const todayIdx = 5; // Saturday (index 0=Mon)
+let state = {
+  name: '',
+  startDate: todayStr(),       // дата начала курса
+  bottleOpenDaysAgo: 0,        // сколько дней назад открыли флакон
+  reminderTime: '08:00',
+  // ежедневные данные, ключ = дата YYYY-MM-DD
+  days: {},
+  // чекап-данные по дням
+  feelData: {},
+  exIdx: 0,
+  quizIdx: 0,
+  onboardingDone: false,
+};
+
+function getTodayData() {
+  const d = todayStr();
+  if (!state.days[d]) {
+    state.days[d] = { morning: false, evening: false, water: 0 };
+  }
+  return state.days[d];
+}
 
 // ── ONBOARDING ──
 let ob = 0;
+let selectedReminderTime = '08:00';
+let selectedBottleDaysAgo = null;
+
 function nextOb(){
   document.getElementById('ob'+ob).classList.remove('active');
   document.getElementById('dot'+ob).classList.remove('active');
@@ -740,13 +792,43 @@ function nextOb(){
     document.getElementById('dot'+ob).classList.add('active');
   }
 }
+
+function selectTime(el, time) {
+  document.querySelectorAll('#timePicker .intake-btn').forEach(b=>b.classList.remove('done'));
+  el.classList.add('done');
+  selectedReminderTime = time;
+  document.getElementById('selectedTimeDisplay').textContent = '✓ Выбрано: ' + time;
+  document.getElementById('customTimeInput').value = '';
+}
+
+function selectCustomTime() {
+  const val = document.getElementById('customTimeInput').value;
+  if (!val) { showToast('Введите время'); return; }
+  document.querySelectorAll('#timePicker .intake-btn').forEach(b=>b.classList.remove('done'));
+  selectedReminderTime = val;
+  document.getElementById('selectedTimeDisplay').textContent = '✓ Выбрано: ' + val;
+}
+
 function selectOne(selector, el){
   document.querySelectorAll(selector+' .intake-btn').forEach(b=>b.classList.remove('done'));
   el.classList.add('done');
 }
+
+function selectBottle(el, daysAgo) {
+  document.querySelectorAll('#bottlePicker .intake-btn').forEach(b=>b.classList.remove('done'));
+  el.classList.add('done');
+  selectedBottleDaysAgo = daysAgo;
+}
+
 function enterApp(){
-  const name = document.getElementById('nameInput').value.trim() || 'Елена';
-  document.getElementById('profileName').textContent = name;
+  const name = document.getElementById('nameInput').value.trim() || 'Пользователь';
+  state.name = name;
+  state.reminderTime = selectedReminderTime;
+  state.bottleOpenDaysAgo = selectedBottleDaysAgo !== null ? selectedBottleDaysAgo : 0;
+  state.startDate = todayStr();
+  state.onboardingDone = true;
+  saveState();
+
   document.getElementById('onboarding').style.display='none';
   document.getElementById('app').style.display='block';
   initAll();
@@ -762,11 +844,17 @@ function showTab(id, el){
     const badge = document.getElementById('feelBadge');
     if(badge) badge.style.display='none';
   }
+  if(id==='profile') updateProfileScreen();
 }
 
 // ── INIT ──
 function initAll(){
-  document.getElementById('dailyTip').textContent = tips[Math.floor(Math.random()*tips.length)];
+  // Совет дня — фиксированный по дате, не случайный
+  const dayOfYear = Math.floor((new Date() - new Date(new Date().getFullYear(),0,0)) / 86400000);
+  document.getElementById('dailyTip').textContent = tips[dayOfYear % tips.length];
+
+  updateProfileName();
+  updateReminderTime();
   renderWeek();
   renderBottle();
   renderExercise();
@@ -774,35 +862,148 @@ function initAll(){
   renderHeatmap();
   renderWater();
   renderQuiz();
+  renderStreak();
+  renderCourse();
+  updateProfileScreen();
+  updatePushPreview();
+}
+
+function updateProfileName() {
+  document.getElementById('profileName').textContent = state.name || '—';
+}
+
+function updateReminderTime() {
+  const t = state.reminderTime || '08:00';
+  document.getElementById('reminderTimeSub').textContent = 'Каждый день в ' + t;
+}
+
+// ── STREAK ──
+function calcStreak() {
+  let streak = 0;
+  const d = new Date();
+  // проверяем назад от вчера (сегодня ещё может не быть)
+  const today = todayStr();
+  const todayData = state.days[today];
+  const todayDone = todayData && (todayData.morning || todayData.evening);
+
+  if (todayDone) {
+    streak = 1;
+    d.setDate(d.getDate() - 1);
+  } else {
+    // начинаем со вчера
+    d.setDate(d.getDate() - 1);
+  }
+
+  for (let i = 0; i < 365; i++) {
+    const key = d.toISOString().slice(0,10);
+    const dd = state.days[key];
+    if (dd && (dd.morning || dd.evening)) {
+      streak++;
+      d.setDate(d.getDate() - 1);
+    } else {
+      break;
+    }
+  }
+  return streak;
+}
+
+function renderStreak() {
+  const streak = calcStreak();
+  document.getElementById('streakNum').textContent = streak;
+  const sub = streak === 0 ? 'Начните сегодня!' :
+    streak === 1 ? 'день подряд — хорошее начало!' :
+    streak < 7 ? 'дня подряд — продолжайте!' :
+    streak < 30 ? 'дней подряд — отличный результат!' :
+    'дней подряд — вы чемпион! 🏆';
+  document.getElementById('streakSub').textContent = sub;
+}
+
+function animateStreak(){
+  const el = document.getElementById('streakNum');
+  el.classList.remove('streak-pop');
+  void el.offsetWidth;
+  el.classList.add('streak-pop');
+  setTimeout(()=>el.classList.remove('streak-pop'),500);
+}
+
+// ── COURSE PROGRESS ──
+function renderCourse() {
+  const start = new Date(state.startDate);
+  const now = new Date();
+  const daysInCourse = Math.floor((now - start) / 86400000);
+  const week = Math.floor(daysInCourse / 7) + 1;
+  const pct = Math.min(100, Math.round(daysInCourse / 84 * 100));
+  document.getElementById('courseWeekLabel').textContent = `Неделя ${Math.min(week, 12)} из 12`;
+  document.getElementById('courseBar').style.width = pct + '%';
 }
 
 // ── WEEK ──
 function renderWeek(){
   const grid = document.getElementById('weekGrid');
-  grid.innerHTML = weekDone.map((d,i)=>`
-    <div class="week-day${d?' done':''}${i===todayIdx?' today':''}">
-      ${d?'✓':'·'}
-    </div>`).join('');
-  const cnt = weekDone.reduce((a,v)=>a+v,0);
+  const now = new Date();
+  const dow = now.getDay(); // 0=Sun
+  const mondayOffset = dow === 0 ? -6 : 1 - dow;
+  const cells = [];
+  const todayKey = todayStr();
+
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(now);
+    d.setDate(d.getDate() + mondayOffset + i);
+    const key = d.toISOString().slice(0,10);
+    const dd = state.days[key];
+    const done = dd && (dd.morning || dd.evening);
+    const isToday = key === todayKey;
+    cells.push(`<div class="week-day${done?' done':''}${isToday?' today':''}">${done?'✓':'·'}</div>`);
+  }
+  grid.innerHTML = cells.join('');
+
+  const cnt = Object.entries(state.days).filter(([k,v]) => {
+    const d = new Date(k);
+    const now2 = new Date();
+    const mondayD = new Date(now2);
+    mondayD.setDate(now2.getDate() + mondayOffset);
+    const sundayD = new Date(mondayD);
+    sundayD.setDate(mondayD.getDate() + 6);
+    return d >= mondayD && d <= sundayD && (v.morning || v.evening);
+  }).length;
+
   document.getElementById('weekSub').textContent = cnt+' из 7 дней — '+
     (cnt>=6?'превосходно!':cnt>=4?'продолжайте!':'ещё можно лучше 💪');
 }
 
 // ── BOTTLE ──
+function calcBottleUsed() {
+  // 2 дозы в день × количество дней с открытия
+  const daysAgo = state.bottleOpenDaysAgo || 0;
+  const used = Math.min(30, daysAgo * 2);
+  return used;
+}
+
 function renderBottle(){
-  const total=30, used=9;
+  const used = calcBottleUsed();
+  const total = 30;
+  const remaining = total - used;
+  const daysLeft = Math.round(remaining / 2);
+
   document.getElementById('bottleDots').innerHTML =
     Array.from({length:total},(_,i)=>`<div class="bottle-dot${i<used?' empty':''}"></div>`).join('');
+  document.getElementById('bottleSubText').textContent = `Осталось ~${remaining} доз · ~${daysLeft} дней`;
+  document.getElementById('bottleUsedText').textContent = `${used} из ${total} доз`;
+
+  // Обновляем текст в профиле
+  const refill = document.getElementById('refillText');
+  if (refill) refill.textContent = `До конца флакона ~${daysLeft} дней. Закажите заранее, чтобы не прерывать курс!`;
 }
 
 // ── EXERCISE ──
 function renderExercise(){
-  const ex = exercises[exIdx % exercises.length];
+  const ex = exercises[state.exIdx % exercises.length];
   document.getElementById('exName').textContent = ex.name;
   document.getElementById('exText').textContent = ex.text;
 }
 function nextExercise(){
-  exIdx++;
+  state.exIdx++;
+  saveState();
   renderExercise();
   const btn = document.getElementById('exBtn');
   btn.classList.remove('pop');
@@ -814,62 +1015,87 @@ function nextExercise(){
 
 // ── INTAKE ──
 function toggleIntake(id, el){
-  el.classList.toggle('done');
-  const done = el.classList.contains('done');
-  el.querySelector('.big').textContent = done?'✅':'⏳';
-  const mDone = document.getElementById('btn-morning').classList.contains('done');
-  const eDone = document.getElementById('btn-evening').classList.contains('done');
+  const td = getTodayData();
+  td[id] = !td[id];
+  saveState();
+
+  el.classList.toggle('done', td[id]);
+  el.querySelector('.big').textContent = td[id]?'✅':'⏳';
+
+  const mDone = td.morning;
+  const eDone = td.evening;
   document.getElementById('intakeMsg').textContent =
-    (mDone&&eDone) ? '🎉 Оба приёма сегодня — отлично!' : done ? '✓ Отмечено, так держать!' : '';
+    (mDone&&eDone) ? '🎉 Оба приёма сегодня — отлично!' : td[id] ? '✓ Отмечено, так держать!' : '';
   if(mDone&&eDone) setTimeout(animateStreak,200);
+
+  renderStreak();
+  renderWeek();
 }
 
 // ── WATER ──
 function renderWater(){
+  const td = getTodayData();
+  const filled = td.water || 0;
+  const total = 8;
   const track = document.getElementById('waterTrack');
-  track.innerHTML = Array.from({length:waterTotal},(_,i)=>
-    `<div class="water-cup${i<waterFilled?' filled':''}" onclick="toggleWater(${i})">💧</div>`
+  track.innerHTML = Array.from({length:total},(_,i)=>
+    `<div class="water-cup${i<filled?' filled':''}" onclick="toggleWater(${i})">💧</div>`
   ).join('');
-  document.getElementById('waterCount').textContent = waterFilled+' / '+waterTotal;
-  const left = waterTotal - waterFilled;
+  document.getElementById('waterCount').textContent = filled+' / '+total;
+  const left = total - filled;
   document.getElementById('waterTip').textContent = left>0
     ? `Ещё ${left} стакан${left===1?'':left<5?'а':'ов'} до нормы — синовиальная жидкость скажет спасибо!`
     : '✅ Норма воды выполнена! Отличный день для суставов.';
 }
 function toggleWater(i){
-  waterFilled = (i < waterFilled) ? i : i+1;
+  const td = getTodayData();
+  const filled = td.water || 0;
+  td.water = (i < filled) ? i : i+1;
+  saveState();
   renderWater();
-  if(waterFilled===waterTotal) showToast('💧 Норма воды выполнена!');
-}
-
-// ── STREAK ──
-function animateStreak(){
-  const el = document.getElementById('streakNum');
-  el.classList.remove('streak-pop');
-  void el.offsetWidth;
-  el.classList.add('streak-pop');
-  setTimeout(()=>el.classList.remove('streak-pop'),500);
+  if(td.water === 8) showToast('💧 Норма воды выполнена!');
 }
 
 // ── FEEL ──
+let feelData = [null,null,null,null,null,null,null];
+
 function renderFeel(){
   const chart = document.getElementById('feelChart');
   if(!chart) return;
   const colors=['#fca5a5','#fcd34d','#86efac','#4ade80'];
   const emojis=['😣','😕','😐','😊'];
-  chart.innerHTML = feelData.map(v=>`
+
+  // Загружаем данные за последние 7 дней
+  const now = new Date();
+  const dow = now.getDay();
+  const mondayOffset = dow === 0 ? -6 : 1 - dow;
+
+  const displayData = [];
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(now);
+    d.setDate(d.getDate() + mondayOffset + i);
+    const key = d.toISOString().slice(0,10);
+    const val = state.feelData[key];
+    displayData.push(val !== undefined ? val : null);
+  }
+
+  chart.innerHTML = displayData.map(v => v !== null ? `
     <div style="display:flex;flex-direction:column;align-items:center;flex:1;gap:3px;">
       <div style="font-size:11px;">${emojis[v]}</div>
       <div style="width:100%;height:${Math.round((v/3)*68)}px;border-radius:6px 6px 0 0;
            background:${colors[v]};transition:height .4s;min-height:4px;"></div>
+    </div>` : `
+    <div style="display:flex;flex-direction:column;align-items:center;flex:1;gap:3px;">
+      <div style="font-size:11px;">·</div>
+      <div style="width:100%;height:4px;border-radius:6px 6px 0 0;background:var(--border);"></div>
     </div>`).join('');
 }
-function setFeel(val,el){
+
+function setFeel(val, el){
   document.querySelectorAll('.feel-btn').forEach(b=>b.classList.remove('selected'));
   el.classList.add('selected');
-  const day = new Date().getDay();
-  const idx = day===0 ? 6 : day-1;
-  feelData[idx]=val;
+  state.feelData[todayStr()] = val;
+  saveState();
   renderFeel();
   const msgs=[
     'Понял. Следим за динамикой. Тепло и режим помогут.',
@@ -892,8 +1118,9 @@ function cycleJoint(el){
 }
 
 // ── QUIZ ──
+let quizAnswered = false;
 function renderQuiz(){
-  const q = quizBank[quizIdx % quizBank.length];
+  const q = quizBank[state.quizIdx % quizBank.length];
   document.getElementById('quizQuestion').textContent = q.q;
   document.getElementById('quizOpts').innerHTML = q.opts.map((o,i)=>
     `<div class="quiz-opt" onclick="answerQuiz(this,${i===q.c},${q.c})">${o}</div>`
@@ -909,26 +1136,97 @@ function answerQuiz(el, correct, correctIdx){
   if(!correct){
     document.querySelectorAll('.quiz-opt')[correctIdx].classList.add('correct');
   }
-  const q = quizBank[quizIdx % quizBank.length];
+  const q = quizBank[state.quizIdx % quizBank.length];
   document.getElementById('quizResult').textContent = (correct?'✓ Верно! ':'✗ Неверно. ') + q.exp;
   document.getElementById('quizNextBtn').style.display = 'block';
 }
 function nextQuiz(){
-  quizIdx++;
+  state.quizIdx++;
+  saveState();
   renderQuiz();
   showToast('Следующий вопрос 🎯');
 }
 
 // ── HEATMAP ──
 function renderHeatmap(){
-  const done=[1,1,0,1,1,1,0,1,1,1,1,0,1,1,1,1,1,0,1,1,1,0,1,1,1,1,1,1,0,1,1];
   const hm = document.getElementById('heatmap');
   if(!hm) return;
-  hm.innerHTML = Array.from({length:3},()=>'<div style="aspect-ratio:1;"></div>').join('')
-    + done.map((d,i)=>`
-      <div style="aspect-ratio:1;border-radius:4px;background:${d?'var(--accent)':'var(--border)'};
-           opacity:${d?1:.35};display:flex;align-items:center;justify-content:center;
-           font-size:9px;color:${d?'#fff':'var(--fg3)'};">${i+1}</div>`).join('');
+
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth();
+  const firstDay = new Date(year, month, 1);
+  const lastDay = new Date(year, month + 1, 0);
+
+  // Смещение (Пн=0)
+  let startDow = firstDay.getDay();
+  startDow = startDow === 0 ? 6 : startDow - 1;
+
+  // Пустые ячейки в начале
+  let cells = Array.from({length: startDow}, () =>
+    '<div style="aspect-ratio:1;"></div>'
+  ).join('');
+
+  for (let day = 1; day <= lastDay.getDate(); day++) {
+    const d = new Date(year, month, day);
+    const key = d.toISOString().slice(0,10);
+    const dd = state.days[key];
+    const done = dd && (dd.morning || dd.evening);
+    const isToday = key === todayStr();
+    cells += `<div style="aspect-ratio:1;border-radius:4px;background:${done?'var(--accent)':'var(--border)'};
+         opacity:${done?1:.35};display:flex;align-items:center;justify-content:center;
+         font-size:9px;color:${done?'#fff':'var(--fg3)'};
+         ${isToday?'outline:2px solid var(--accent-d);':''}">${day}</div>`;
+  }
+  hm.innerHTML = cells;
+}
+
+// ── PROFILE SCREEN ──
+function updateProfileScreen() {
+  const streak = calcStreak();
+  document.getElementById('statStreak').textContent = streak;
+  document.getElementById('streakBadge').textContent = `🏆 ${streak} дней стрик`;
+
+  // Всего приёмов
+  const total = Object.values(state.days).reduce((acc, d) => {
+    return acc + (d.morning ? 1 : 0) + (d.evening ? 1 : 0);
+  }, 0);
+  document.getElementById('statTotal').textContent = total;
+
+  // Прогресс курса
+  const start = new Date(state.startDate);
+  const daysInCourse = Math.floor((new Date() - start) / 86400000);
+  const pct = Math.min(100, Math.round(daysInCourse / 84 * 100));
+  document.getElementById('statCourse').textContent = pct + '%';
+
+  // Дата начала
+  const startFmt = new Date(state.startDate).toLocaleDateString('ru-RU', {day:'numeric', month:'long'});
+  document.getElementById('profileSince').textContent = `С нами с ${startFmt} · Курс 1`;
+
+  // Достижения
+  if (streak >= 7) {
+    const el = document.getElementById('ach7');
+    el.style.opacity = '1';
+    el.style.border = '1.5px solid var(--accent)';
+    el.querySelector('div:nth-child(2)').style.color = 'var(--accent)';
+  }
+  if (streak >= 30) {
+    const el = document.getElementById('ach30');
+    el.style.opacity = '1';
+    el.style.border = '1.5px solid var(--gold)';
+    el.querySelector('div:nth-child(2)').style.color = 'var(--gold)';
+  }
+
+  renderHeatmap();
+}
+
+// ── PUSH PREVIEW ──
+function updatePushPreview() {
+  const streak = calcStreak();
+  const name = state.name || 'Пользователь';
+  document.getElementById('pushTitle').textContent = `Артро-Питание 🔥 ${streak} дней`;
+  document.getElementById('pushBody').textContent =
+    `${name}, доброе утро! Время принять утреннюю порцию. ${streak > 0 ? `Стрик ${streak} дней — не останавливайтесь 💪` : 'Начните свою серию сегодня 💪'}`;
 }
 
 // ── ARTICLE MODAL ──
@@ -960,8 +1258,78 @@ function showToast(msg){
   toastTimer = setTimeout(()=>t.classList.remove('show'), 2400);
 }
 
-// ── SHARE ──
-function shareApp(){ showToast('✓ Ссылка скопирована!'); }
+// ── SHARE (BUG FIX) ──
+function shareApp(){
+  const url = window.location.href.split('?')[0].split('#')[0];
+  const text = `Веду дневник приёма Артро-Питания уже ${calcStreak()} дней! 💪 Присоединяйся: ${url}`;
+  if (navigator.share) {
+    navigator.share({ title: 'Дневник Артро-Питания', text: text, url: url })
+      .catch(() => copyFallback(url));
+  } else {
+    copyFallback(url);
+  }
+}
+
+function copyFallback(url) {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(url).then(() => {
+      showToast('✓ Ссылка скопирована!');
+    }).catch(() => {
+      selectAndCopy(url);
+    });
+  } else {
+    selectAndCopy(url);
+  }
+}
+
+function selectAndCopy(url) {
+  const el = document.createElement('textarea');
+  el.value = url;
+  el.style.position = 'fixed';
+  el.style.opacity = '0';
+  document.body.appendChild(el);
+  el.focus();
+  el.select();
+  try {
+    document.execCommand('copy');
+    showToast('✓ Ссылка скопирована!');
+  } catch(e) {
+    showToast('Ссылка: ' + url);
+  }
+  document.body.removeChild(el);
+}
+
+// ── BOOT ──
+(function boot() {
+  const saved = loadState();
+  if (saved && saved.onboardingDone) {
+    // Восстанавливаем состояние
+    state = { ...state, ...saved };
+    // Восстанавливаем сегодняшние данные в UI
+    const td = getTodayData();
+    document.getElementById('onboarding').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    initAll();
+
+    // Восстанавливаем кнопки приёма
+    if (td.morning) {
+      const btn = document.getElementById('btn-morning');
+      btn.classList.add('done');
+      btn.querySelector('.big').textContent = '✅';
+    }
+    if (td.evening) {
+      const btn = document.getElementById('btn-evening');
+      btn.classList.add('done');
+      btn.querySelector('.big').textContent = '✅';
+    }
+    if (td.morning && td.evening) {
+      document.getElementById('intakeMsg').textContent = '🎉 Оба приёма сегодня — отлично!';
+    } else if (td.morning || td.evening) {
+      document.getElementById('intakeMsg').textContent = '✓ Отмечено, так держать!';
+    }
+  }
+  // Иначе онбординг остаётся виден
+})();
 </script>
 </body>
 </html>
